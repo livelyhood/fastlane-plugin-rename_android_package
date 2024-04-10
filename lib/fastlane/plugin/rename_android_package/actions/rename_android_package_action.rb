@@ -8,6 +8,7 @@ module Fastlane
         path = params[:path]
         package_name = params[:package_name]
         new_package_name = params[:new_package_name]
+        use_kotlin_workaround = params[:use_kotlin_workaround]
 
         folder = package_name.gsub('.', '/')
         new_folder = new_package_name.gsub('.', '/')
@@ -15,19 +16,26 @@ module Fastlane
 
         FileUtils::mkdir_p new_folder_path
 
-        java_sources = Dir.glob("#{path}/app/src/main/java/#{folder}/*.java")
+        java_sources = Dir.glob("#{path}/app/src/main/java/#{folder}/*.{java,kt}")
         java_sources.each do |file|
           FileUtils.mv file, new_folder_path
         end
-        
-     
+
         sed = "sed -i "  #linux sed  https://stackoverflow.com/questions/43171648/sed-gives-sed-cant-read-no-such-file-or-directory
         if FastlaneCore::Helper.mac?
           sed = "sed -i '' " # mac sed 
         end
     
         Bundler.with_clean_env do
-          sh "find #{path}/app/src -name '*.java' -type f -exec #{sed} 's/#{package_name}/#{new_package_name}/' {} \\;"
+          # Temporary workaround for Kotlin files, more info: https://github.com/expo/expo/pull/27458
+          if use_kotlin_workaround
+            modified_package_name = package_name.gsub(/\b(in|is|as|object)\b/, '`\1`')
+            modified_new_package_name = new_package_name.gsub(/\b(in|is|as|object)\b/, '`\1`')
+          else
+            modified_package_name = package_name
+            modified_new_package_name = new_package_name
+          end
+          sh "find #{path}/app/src -name '*.java' -type f -exec #{sed} 's/#{modified_package_name}/#{modified_new_package_name}/' {} \\;"
           sh "find #{path}/app/src -name 'AndroidManifest.xml' -type f -exec #{sed} 's/#{package_name}/#{new_package_name}/' {} \\;"
           sh "find #{path}/app -name 'build.gradle' -type f -exec #{sed} 's/#{package_name}/#{new_package_name}/' {} \\;"
         end
@@ -58,7 +66,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :new_package_name,
                                        env_name: "FL_RENAME_ANDROID_PACKAGE_NEW_PACKAGE_NAME",
                                        description: "New package name",
-                                       is_string: true)
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :use_kotlin_workaround,
+                                        env_name: "FL_RENAME_ANDROID_PACKAGE_USE_KOTLIN_WORKAROUND",
+                                        description: "Use kotlin workaround",
+                                        optional: true,
+                                        is_string: false)
         ]
       end
 
