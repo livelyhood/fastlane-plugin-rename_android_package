@@ -1,5 +1,17 @@
 # file is synced from cove-workflow
 
+##################################################################
+# HOW TO CUSTOMIZE A dependabot.yml IN A REPO
+#
+# 1. remove the repository from the sync list here:
+#       https://github.com/livelyhood/cove-workflows/blob/main/.github/sync.yml
+# 2. change dependabot.yml in your repo
+#
+# dependabot configuration options:
+#    https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+###################################################################
+
 version: 2
 registries:
   npm-npmjs:
@@ -11,6 +23,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "friday"
+      time: "15:00" # UTC
     commit-message:
       prefix: chore
       prefix-development: chore
@@ -26,6 +40,8 @@ updates:
       - npm-npmjs
     schedule:
       interval: "weekly"
+      day: "friday"
+      time: "15:00" # UTC
     commit-message:
       prefix: chore
       prefix-development: chore
