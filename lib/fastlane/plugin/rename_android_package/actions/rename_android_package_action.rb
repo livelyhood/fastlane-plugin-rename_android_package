@@ -35,7 +35,12 @@ module Fastlane
             modified_package_name = package_name
             modified_new_package_name = new_package_name
           end
-          sh "find #{path}/app/src -name '*.java' -type f -exec #{sed} 's/#{modified_package_name}/#{modified_new_package_name}/' {} \\;"
+
+          if use_kotlin_workaround
+            sh "find #{path}/app/src -name '*.kt' -type f -exec #{sed} 's/#{modified_package_name}/#{modified_new_package_name}/' {} \\;"
+          else
+            sh "find #{path}/app/src -name '*.java' -type f -exec #{sed} 's/#{modified_package_name}/#{modified_new_package_name}/' {} \\;"
+          end
           sh "find #{path}/app/src -name 'AndroidManifest.xml' -type f -exec #{sed} 's/#{package_name}/#{new_package_name}/' {} \\;"
           sh "find #{path}/app -name 'build.gradle' -type f -exec #{sed} 's/#{package_name}/#{new_package_name}/' {} \\;"
         end
