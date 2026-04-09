@@ -73,10 +73,16 @@ jobs:
   #############################################
   notify-all:
   #############################################
-      uses: livelyhood/cove-workflows/.github/workflows/notify.yml@main
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        id-token: write
       needs:
         - dependabot
       if: ${{ always() && contains(needs.*.result, 'failure') }}
-      secrets: inherit
-      with:
-        failure: true
+      steps:
+        - uses: livelyhood/cove-workflows/notify@main
+          with:
+            failure: true
+            oidc-role-arn: ${{ secrets.OIDC_HUB_ROLE_ARN }}
+            secrets-prefix: ${{ vars.GHA_SECRETS_PREFIX }}
