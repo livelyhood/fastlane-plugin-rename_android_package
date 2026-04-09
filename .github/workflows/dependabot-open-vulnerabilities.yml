@@ -10,10 +10,10 @@ jobs:
     steps:
       - name: check out current repositories
         # to read maintainers.json
-        uses: actions/checkout@v4
+        uses: livelyhood/cove-workflows/vendors/actions/checkout@main
       - name: check out cove-workflows
         # this is necessary because this workflow gets synced to other repos
-        uses: actions/checkout@v4
+        uses: livelyhood/cove-workflows/vendors/actions/checkout@main
         with:
           repository: livelyhood/cove-workflows
           ref: ${{ (github.repository == 'livelyhood/cove-workflows' && github.ref) || 'main' }} # IF the this workflow was called from this repo THEN checkout the current github.ref ELSE use main
