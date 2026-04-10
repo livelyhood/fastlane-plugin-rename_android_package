@@ -10,10 +10,10 @@ jobs:
     steps:
       - name: check out current repositories
         # to read maintainers.json
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: check out cove-workflows
         # this is necessary because this workflow gets synced to other repos
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: livelyhood/cove-workflows
           ref: ${{ (github.repository == 'livelyhood/cove-workflows' && github.ref) || 'main' }} # IF the this workflow was called from this repo THEN checkout the current github.ref ELSE use main
@@ -27,7 +27,7 @@ jobs:
           echo "maintainers=$(cat maintainers.json | jq '.[] | to_entries | .[].value' | jq --slurp -r '. | join(" ")')" >> "$GITHUB_OUTPUT"
       - name: query open dependabot PRs
         id: open-dependabot-prs
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ github.token }}
           script: |
@@ -42,7 +42,7 @@ jobs:
           echo "count=${COUNT}" >> "${GITHUB_OUTPUT}"
       - name: 'Post PR to #dev-pr'
         if: ${{ steps.count-prs.outputs.count > 0 }}
-        uses: slackapi/slack-github-action@v1.25.0
+        uses: slackapi/slack-github-action@v3.0.1
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           TITLE: ${{ format('Open Dependabot PRs in {0}{1} {2}', github.event.repository.name, ':', steps.read-maintainers.outputs.maintainers) }}
