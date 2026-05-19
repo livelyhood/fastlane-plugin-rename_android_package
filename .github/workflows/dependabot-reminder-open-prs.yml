@@ -10,10 +10,10 @@ jobs:
     steps:
       - name: check out current repositories
         # to read maintainers.json
-        uses: livelyhood/cove-workflows/vendors/actions/checkout@main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: check out cove-workflows
         # this is necessary because this workflow gets synced to other repos
-        uses: livelyhood/cove-workflows/vendors/actions/checkout@main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: livelyhood/cove-workflows
           ref: ${{ (github.repository == 'livelyhood/cove-workflows' && github.ref) || 'main' }} # IF the this workflow was called from this repo THEN checkout the current github.ref ELSE use main
@@ -27,7 +27,7 @@ jobs:
           echo "maintainers=$(cat maintainers.json | jq '.[] | to_entries | .[].value' | jq --slurp -r '. | join(" ")')" >> "$GITHUB_OUTPUT"
       - name: query open dependabot PRs
         id: open-dependabot-prs
-        uses: livelyhood/cove-workflows/vendors/actions/github-script@main
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ github.token }}
           script: |
